@@ -24,7 +24,19 @@ const addPayment = async (req,res,next) => {
     }
 }
 
+const getPayments = async (req,res,next) => {
+    try{
+        const payment = await Payment
+            .find({}, { updatedAt: 0,__v:0 })
+            .populate('payed_by', 'name type email contact -_id')
+            .sort('-createdAt');
+        res.send(payment)
+    }catch(ex){
+        next(ex)
+    }
+}
 
 module.exports = {
     addPayment,
+    getPayments
 };
