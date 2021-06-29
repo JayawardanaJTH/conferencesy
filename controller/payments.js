@@ -36,7 +36,20 @@ const getPayments = async (req,res,next) => {
     }
 }
 
+const getPayment = async (req,res,next) => {
+    try{
+        const payment = await Payment
+            .findById(req.params.id, { updatedAt: 0,__v:0 })
+            .populate('payed_by', 'name type email contact -_id')
+        if(!payment) return res.status(404).send('The payment with the given ID was not found');
+        res.send(payment)
+    }catch(ex){
+        next(ex)
+    }
+}
+
 module.exports = {
     addPayment,
-    getPayments
+    getPayments,
+    getPayment
 };
