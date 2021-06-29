@@ -1,0 +1,4 @@
+{
+    "jwtPrivateKey": "1234",
+    "db": "mongodb+srv://admin:admin@123@af.6jdff.mongodb.net/conferencesy?retryWrites=true&w=majority"
+}
