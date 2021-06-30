@@ -74,7 +74,7 @@ function validateStatic(statics){
         email: Joi.string().min(5).max(255).required().email(),
         contact : Joi.string().min(7).max(12).required(),
         cover: Joi.string(),
-        start: Joi.date().max('now'),
+        start: Joi.date(),
         end: Joi.date(),
         venue: Joi.string().min(4).max(1024).required(),
         description: Joi.string().min(12).max(1024).required(),

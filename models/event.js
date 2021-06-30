@@ -50,7 +50,7 @@ function validateEvent(events){
     const schema = Joi.object({
         speaker : Joi.string().min(4).max(50).required(),
         topic : Joi.string().min(4).max(50).required(),
-        start: Joi.date().max('now'),
+        start: Joi.date(),
         end: Joi.date(),
         description: Joi.string().min(12).max(1024).required(),
         approval: Joi.string().valid('pending', 'approved', 'rejected'),
