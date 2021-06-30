@@ -9,8 +9,7 @@ const addGuest = async (req,res,next) => {
             designation: req.body.designation,
             image: req.file.path,
             description: req.body.description,
-            approval: req.body.approval,
-            edited_by: req.body.edited_by,
+            edited_by: req.body.edited_by
         })
         await guest.save()
         res.send({
@@ -20,8 +19,7 @@ const addGuest = async (req,res,next) => {
             image: guest.path,
             description: guest.description,
             approval: guest.approval,
-            edited_by: guest.edited_by,
-            approved_by: guest.approved_by
+            edited_by: guest.edited_by
         })
     }catch(error) {
         res.status(400).send('"Invalid data provided."');
@@ -32,8 +30,36 @@ const getGuests = async (req,res,next) => {
     try{
         const guest = await Guest
         .find({}, {__v:0 })
-        .populate('edited_by','name -_id')
-        .populate('approved_by','name -_id')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
+        .sort('-createdAt');
+        res.send(guest)
+    }catch(ex){
+        next(ex)
+    }
+}
+
+const getPendingGuests = async (req,res,next) => {
+    try{
+        const guest = await Guest
+        .find({}, {__v:0 })
+        .where('approval').equals('pending')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
+        .sort('-createdAt');
+        res.send(guest)
+    }catch(ex){
+        next(ex)
+    }
+}
+
+const getApprovedGuests = async (req,res,next) => {
+    try{
+        const guest = await Guest
+        .find({}, {__v:0 })
+        .where('approval').equals('approved')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
         .sort('-createdAt');
         res.send(guest)
     }catch(ex){
@@ -45,8 +71,8 @@ const getGuest = async (req,res,next) => {
     try{
         const guest = await Guest
         .findById(req.params.id, { __v:0 })
-        .populate('edited_by','name -_id')
-        .populate('approved_by','name -_id')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
         if(!guest) return res.status(404).send('The guest with the given ID was not found');
         res.send(guest)
     }catch(ex){
@@ -62,7 +88,7 @@ const updateGuest = async (req,res,next) => {
             {
                 name: req.body.name,
                 designation: req.body.designation,
-                image: req.file.path,
+                image: req.body.image,
                 description: req.body.description,
                 approval: req.body.approval,
                 edited_by: req.body.edited_by,
@@ -91,6 +117,8 @@ const deleteGuest = async (req,res,next) => {
 module.exports = {
     addGuest,
     getGuests,
+    getPendingGuests,
+    getApprovedGuests,
     getGuest,
     updateGuest,
     deleteGuest
