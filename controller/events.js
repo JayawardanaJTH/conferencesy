@@ -31,8 +31,36 @@ const getEvents = async (req,res,next) => {
     try{
         const events = await Event
         .find({}, { __v:0 })
-        .populate('edited_by','name -_id')
-        .populate('approved_by','name -_id')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
+        .sort('-createdAt');
+        res.send(events)
+    }catch(ex){
+        next(ex)
+    }
+}
+
+const getPendingEvents = async (req,res,next) => {
+    try{
+        const events = await Event
+        .find({}, { __v:0 })
+        .where('approval').equals('pending')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
+        .sort('-createdAt');
+        res.send(events)
+    }catch(ex){
+        next(ex)
+    }
+}
+
+const getApprovedEvents = async (req,res,next) => {
+    try{
+        const events = await Event
+        .find({}, { __v:0 })
+        .where('approval').equals('approved')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
         .sort('-createdAt');
         res.send(events)
     }catch(ex){
@@ -44,8 +72,8 @@ const getEvent = async (req,res,next) => {
     try{
         const events = await Event
         .findById(req.params.id, { __v:0 })
-        .populate('edited_by','name -_id')
-        .populate('approved_by','name -_id')
+        .populate('edited_by','username ,_id')
+        .populate('approved_by','username ,_id')
         if(!events) return res.status(404).send('The event with the given ID was not found');
         res.send(events)
     }catch(ex){
@@ -72,16 +100,7 @@ const updateEvent = async (req,res,next) => {
         
           if (!events) return res.status(404).send('The event with the given ID was not found.');
         
-          res.send({
-            _id: events._id,
-            speaker: events.speaker,
-            topic: events.topic,
-            start:  events.start,
-            end:  events.end,
-            description: events.description,
-            edited_by: events.edited_by,
-            approved_by: req.body.approved_by
-          });
+          res.send(events);
     }catch(ex){
         next(ex)
     }
@@ -100,6 +119,8 @@ const deleteEvent = async (req,res,next) => {
 module.exports = {
     addEvent, 
     getEvents,
+    getPendingEvents,
+    getApprovedEvents,
     getEvent,
     updateEvent,
     deleteEvent

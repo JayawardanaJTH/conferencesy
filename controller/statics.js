@@ -42,8 +42,36 @@ const getStatics = async (req,res,next) => {
     try{
         const statics = await Static
         .find({}, {__v:0 })
-        .populate('edited_by','name -_id')
-        .populate('approved_by','name -_id')
+        .populate('edited_by','username , _id')
+        .populate('approved_by','username , _id')
+        .sort('-createdAt');
+        res.send(statics)
+    }catch(ex){
+        next(ex)
+    }
+}
+
+const getPendingStatics = async (req,res,next) => {
+    try{
+        const statics = await Static
+        .find({}, {__v:0 })
+        .where('approval').equals('pending')
+        .populate('edited_by','username , _id')
+        .populate('approved_by','username , _id')
+        .sort('-createdAt');
+        res.send(statics)
+    }catch(ex){
+        next(ex)
+    }
+}
+
+const getApprovedStatics = async (req,res,next) => {
+    try{
+        const statics = await Static
+        .find({}, {__v:0 })
+        .where('approval').equals('approved')
+        .populate('edited_by','username , _id')
+        .populate('approved_by','username , _id')
         .sort('-createdAt');
         res.send(statics)
     }catch(ex){
@@ -61,7 +89,7 @@ const updateStatic = async (req,res,next) => {
             sub_title: req.body.sub_title,
             email:  req.body.email,
             contact:  req.body.contact,
-            cover: req.file.path,
+            cover: req.body.cover,
             start:  req.body.start,
             end:  req.body.end,
             venue: req.body.venue,
@@ -93,6 +121,8 @@ const deleteStatic = async (req,res,next) => {
 module.exports = {
     addStatic,
     getStatics,
+    getPendingStatics,
+    getApprovedStatics,
     updateStatic,
     deleteStatic
 };
